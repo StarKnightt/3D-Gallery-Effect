@@ -1,60 +1,48 @@
 # 3D Gallery Effect
 
-A WebGL-powered infinite 3D photo gallery built with React Three Fiber. Images float through 3D space with depth-based blur, opacity fading, cloth physics on scroll, and a flag-waving hover effect.
+An infinite 3D photo gallery component for React. Images float through depth with cloth physics, GLSL blur, opacity fading, and a flag-waving hover effect. Built for the shadcn/ui ecosystem.
 
-Live interaction via mouse wheel, arrow keys, or touch. Auto-play kicks in after 3 seconds of inactivity and progressively accelerates.
+Scroll, use arrow keys, or just watch it auto-play.
 
-## Features
+## Preview
 
-- Infinite scroll through a looping set of images along the Z-axis
-- Custom GLSL shaders for real-time cloth deformation, depth blur, and opacity fade
-- Flag-waving animation on hover using vertex displacement
-- Auto-play with progressive speed ramp after idle timeout
-- Golden-angle spatial distribution for natural, non-grid image placement
-- Configurable fade and blur zones via depth-range percentages
-- Automatic aspect ratio preservation for all images
-- WebGL fallback to a static grid when GPU is unavailable
-- Fully typed with TypeScript
-- Keyboard navigation (arrow keys) and scroll wheel support
+Run the project locally and visit [http://localhost:3000](http://localhost:3000) to see it in action.
 
 ## Tech Stack
 
-- **Framework**: Next.js 16 (App Router)
-- **3D Engine**: React Three Fiber + Three.js
-- **Utilities**: @react-three/drei (texture loading)
-- **Styling**: Tailwind CSS v4
-- **UI System**: shadcn/ui
-- **Language**: TypeScript
+- **Three.js** -- 3D rendering via React Three Fiber
+- **React 19** -- Client component with hooks
+- **Next.js 16** -- App Router
+- **Tailwind CSS v4** -- Styling
+- **TypeScript** -- Fully typed props
+- **shadcn/ui** -- Project structure and conventions
 
-## Getting Started
+## Installation
 
 ### Prerequisites
 
-- Node.js 18+
-- npm
-
-### Installation
+A React project with the shadcn/ui structure. If you don't have one:
 
 ```bash
-git clone https://github.com/StarKnightt/3D-Gallery-Effect.git
-cd 3D-Gallery-Effect
-npm install
+npx shadcn@latest init
 ```
 
-### Development
+### Install dependencies
 
 ```bash
-npm run dev
+npm install three @react-three/fiber @react-three/drei
+npm install -D @types/three
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+### Copy the component
 
-### Production Build
+Copy `3d-gallery-photography.tsx` into your project:
 
-```bash
-npm run build
-npm start
 ```
+src/components/ui/3d-gallery-photography.tsx
+```
+
+> **Why `/components/ui`?** This is the shadcn convention. All reusable UI primitives live here so they're co-located, easy to find, and consistent with other shadcn components you may add.
 
 ## Usage
 
@@ -115,7 +103,19 @@ Values are percentages (0-1) of the total depth range. Images fade from transpar
 
 Depth blur is applied via a fragment shader approximation. `maxBlur` controls the peak blur intensity (0-10 range).
 
-## Architecture
+## Features
+
+- Infinite Z-axis scroll through a looping image set
+- Custom GLSL vertex and fragment shaders for cloth deformation, depth blur, and opacity
+- Flag-waving animation on hover via vertex displacement
+- Auto-play with progressive speed ramp after 3 seconds idle
+- Golden-angle spatial distribution for natural, non-grid placement
+- Configurable fade and blur zones via depth-range percentages
+- Automatic aspect ratio preservation
+- Keyboard navigation (arrow keys) and scroll wheel support
+- WebGL fallback to a static CSS grid when GPU is unavailable
+
+## How It Works
 
 ### Rendering Pipeline
 
@@ -130,32 +130,37 @@ The component renders `visibleCount` textured planes distributed in 3D space. Ea
 
 Two custom GLSL shaders handle all visual effects:
 
-**Vertex Shader** -- Applies three layers of displacement:
+**Vertex Shader** -- Three layers of displacement:
 - Scroll-force-based curvature (quadratic distance from center)
 - Cloth ripple effect (sinusoidal waves modulated by scroll intensity)
 - Flag-wave animation on hover (phase-shifted sine waves with edge dampening)
 
-**Fragment Shader** -- Handles per-pixel effects:
+**Fragment Shader** -- Per-pixel effects:
 - Depth-based Gaussian blur approximation (5x5 kernel, weighted sampling)
 - Scroll-force highlight for subtle lighting on curved surfaces
 - Alpha blending with the opacity uniform
 
 ### Spatial Distribution
 
-Image positions use the golden angle (2.618 radians) for horizontal distribution and an offset golden ratio (1.618) for vertical distribution. This avoids grid patterns and produces a natural, scattered arrangement across the viewport.
+Image positions use the golden angle (2.618 radians) for horizontal distribution and an offset golden ratio (1.618) for vertical. This avoids grid patterns and produces a natural, scattered arrangement across the viewport.
 
 ## Performance
 
-- **Zero React re-renders during animation**: All per-frame updates write directly to Three.js uniforms and mutable refs. React state is only used for discrete events (hover, scroll start/stop, auto-play toggle).
-- **Material pooling**: Shader materials are created once and reused across frames. Textures are loaded once via `useTexture` and assigned by index.
-- **Fixed plane count**: The number of rendered meshes is constant regardless of image array length. Images cycle through planes via index wrapping, not DOM creation/destruction.
-- **Geometry sharing**: All planes use the same `planeGeometry` instance (1x1, 32x32 subdivisions) scaled per-plane via the mesh scale property.
-- **Lightweight shaders**: The blur kernel is a 5x5 weighted sample (25 texture lookups per fragment). This is intentionally small to maintain 60fps on integrated GPUs while still producing a visible depth-of-field effect.
-- **No post-processing**: All effects (blur, fade, cloth deformation) are computed per-material in a single render pass. There are no additional render targets or post-processing passes.
+- **Zero React re-renders during animation.** All per-frame updates write directly to Three.js uniforms and mutable refs. React state is only used for discrete events (hover, scroll start/stop, auto-play toggle).
+- **Material pooling.** Shader materials are created once and reused across frames. Textures are loaded once via `useTexture` and assigned by index.
+- **Fixed plane count.** The number of rendered meshes is constant regardless of image array length. Images cycle through planes via index wrapping, not DOM creation/destruction.
+- **Geometry sharing.** All planes use the same `planeGeometry` instance (1x1, 32x32 subdivisions) scaled per-plane via the mesh scale property.
+- **Lightweight shaders.** The blur kernel is a 5x5 weighted sample (25 texture lookups per fragment). Intentionally small to maintain 60fps on integrated GPUs while still producing a visible depth-of-field effect.
+- **Single render pass.** All effects (blur, fade, cloth deformation) are computed per-material. No additional render targets or post-processing passes.
 
 ## Browser Support
 
 Requires WebGL 1.0. Works in all modern browsers. When WebGL is unavailable, the component renders a static CSS grid fallback.
+
+- Chrome / Edge 80+
+- Firefox 80+
+- Safari 15+
+- Mobile Safari / Chrome on iOS and Android
 
 ## License
 
