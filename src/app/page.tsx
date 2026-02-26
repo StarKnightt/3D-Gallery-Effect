@@ -5,11 +5,17 @@ export default function Home() {
     { src: "/images/mountain.jpg", alt: "Mountain landscape" },
     { src: "/images/ocean.jpg", alt: "Ocean waves" },
     { src: "/images/forest.jpg", alt: "Forest path" },
+    { src: "/images/lavender.jpg", alt: "Lavender field" },
     { src: "/images/desert.jpg", alt: "Desert dunes" },
+    { src: "/images/lake.jpg", alt: "Mountain lake" },
     { src: "/images/city.jpg", alt: "City skyline" },
+    { src: "/images/fog.jpg", alt: "Misty forest" },
     { src: "/images/aurora.jpg", alt: "Northern lights" },
+    { src: "/images/cliff.jpg", alt: "Sea cliff" },
     { src: "/images/waterfall.jpg", alt: "Waterfall" },
+    { src: "/images/stars.jpg", alt: "Starry night" },
     { src: "/images/sunset.jpg", alt: "Sunset beach" },
+    { src: "/images/meadow.jpg", alt: "Green meadow" },
   ]
 
   return (
@@ -18,7 +24,7 @@ export default function Home() {
         images={sampleImages}
         speed={1.2}
         zSpacing={3}
-        visibleCount={12}
+        visibleCount={16}
         falloff={{ near: 0.8, far: 14 }}
         className="h-screen w-full rounded-lg overflow-hidden"
       />
